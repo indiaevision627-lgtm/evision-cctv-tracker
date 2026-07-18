@@ -842,6 +842,7 @@ function previewEditImg(input) {
 
 async function saveEdit() {
   if (!editLeadId) return;
+  const idToUpdate = editLeadId; // capture BEFORE closeEditModal() clears editLeadId
   const name = document.getElementById('e-name').value.trim();
   const phone = document.getElementById('e-phone').value.trim();
   if (!name || !phone) { showToast('❌ Naam aur phone zaroori!', true); return; }
@@ -855,11 +856,11 @@ async function saveEdit() {
     notes: document.getElementById('e-notes').value.trim(),
     image_data: editImgData
   };
-  leads = leads.map(l => l.id === editLeadId ? {...l, ...updated} : l);
+  leads = leads.map(l => l.id === idToUpdate ? {...l, ...updated} : l);
   renderTable(); renderCallingView();
   closeEditModal();
   try {
-    await api(TABLE + '?id=eq.' + editLeadId, { method: 'PATCH', body: JSON.stringify(updated) });
+    await api(TABLE + '?id=eq.' + idToUpdate, { method: 'PATCH', body: JSON.stringify(updated) });
     showToast('✅ Lead update ho gaya!');
   } catch(e) {
     showToast('❌ Update nahi hua: ' + e.message, true);
